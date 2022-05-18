@@ -2,6 +2,7 @@ import os
 from PypOrganizer import ProblemOrganizer
 from functools import cmp_to_key
 
+
 def __find_all_occurrence(base: str, name: str):
     """
     Finds all files with a certain name in a directory.
