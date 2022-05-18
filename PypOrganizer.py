@@ -9,7 +9,7 @@ class ContentExtractor:
         :param path: The path of the file.
         """
         self.path = path
-        with open(path, 'r', encoding='UTF-8') as file:
+        with open(path, 'r', encoding='utf-8-sig') as file:
             self.lines = file.readlines()
 
     def __str__(self):
@@ -43,7 +43,9 @@ class ProblemOrganizer:
         :param extractor: the ContentExtractor we will deal with.
         :return: the filtered list of content.
         """
-        return list(filter(lambda line: line.startswith('    ') or not line.strip(), self.extractor.lines))
+        return list(filter(lambda line: line.startswith('    ') or
+                                        line.startswith('\t') or
+                                        not line.strip(), self.extractor.lines))
 
     def group_problems(self):
         group = []
