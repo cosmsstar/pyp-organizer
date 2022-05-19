@@ -1,6 +1,6 @@
 import os
-from PypOrganizer import ProblemOrganizer
-import ConfigOrganizer
+from PypOrganizer import Problem, ProblemOrganizer
+from ConfigOrganizer import *
 
 
 def __find_all_occurrence(base: str, name: str):
@@ -26,27 +26,28 @@ def group_problems(base: str, name: str):
     return problems
 
 
-def sort_problems(problems):
-    problems_with_keys = sorted(map(ProblemOrganizer.extract_keys, problems), key=lambda p: p[0][1])
-    sections = set(n for n in map(lambda p : p[0][0], problems_with_keys))
+def sort_problems(problems: list[Problem]):
+    problems_with_keys = sorted(problems, key=lambda p: p.get_number())
+    sections = set(n for n in map(lambda p: p.get_section(), problems_with_keys))
     result = dict()
     for s in sections:
-        result[s] = [p[1] for p in problems_with_keys if p[0][0] == s]
+        result[s] = [p.get_content() for p in problems_with_keys if p.get_section() == s]
     return result
 
 
 def generate_problems(base: str, name: str, config_path: str):
     problems = sort_problems(group_problems(base, name))
-    output = [ConfigOrganizer.generate_preamble(config_path),
-              ConfigOrganizer.BEGIN_DOCUMENT,
-              ConfigOrganizer.generate_title(config_path)]
+    output = [generate_preamble(config_path),
+              BEGIN_DOCUMENT,
+              generate_title(config_path)]
     for section in sorted(problems.keys()):
         section_problem = problems[section]
-        output.append(ConfigOrganizer.BEGIN_QUESTION)
+        output.append(generate_section(config_path, int(section)))
+        output.append(BEGIN_QUESTION)
         for problem in section_problem:
             output.append(problem + '\n\n')
-        output.append(ConfigOrganizer.END_QUESTION)
-    output.append(ConfigOrganizer.END_DOCUMENT)
+        output.append(END_QUESTION)
+    output.append(END_DOCUMENT)
 
     return output
 
@@ -56,7 +57,7 @@ def organize_problems(base: str, name: str, dest: str, dest_name: str, config_pa
     if not os.path.exists(dest):
         os.makedirs(dest)
     dest_file = os.path.join(dest, dest_name)
-    with open(dest_file, 'w', encoding='utf-8-sig') as file:
+    with open(dest_file, 'w', encoding=ENCODING) as file:
         file.writelines(problems)
 
 

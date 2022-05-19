@@ -1,3 +1,29 @@
+from ConfigOrganizer import ENCODING
+
+
+class Problem:
+    """
+    A class that represents a problem.
+    """
+
+    def __init__(self, problem: str):
+        numbers = problem.split()[1].split('-')
+        self.__key = tuple(map(lambda num: float(num), numbers))
+        self.__problem = problem
+
+    def __str__(self):
+        return self.__problem.split('\n')[3].strip()[:15] + '...'
+
+    def get_section(self):
+        return self.__key[0]
+
+    def get_number(self):
+        return self.__key[1]
+
+    def get_content(self):
+        return self.__problem
+
+
 class ContentExtractor:
     """
     A class that stores the content of a file as a list of strings.
@@ -9,7 +35,7 @@ class ContentExtractor:
         :param path: The path of the file.
         """
         self.path = path
-        with open(path, 'r', encoding='utf-8-sig') as file:
+        with open(path, 'r', encoding=ENCODING) as file:
             self.lines = file.readlines()
 
     def __str__(self):
@@ -40,7 +66,6 @@ class ProblemOrganizer:
     def __filter_content(self):
         """
         Filter out contents that are not part of the answers / questions, including the titles.
-        :param extractor: the ContentExtractor we will deal with.
         :return: the filtered list of content.
         """
         return list(filter(lambda line: line.startswith('    ') or
@@ -65,14 +90,4 @@ class ProblemOrganizer:
         if current_problem:
             group.append(current_problem.rstrip())
 
-        return group
-
-    @staticmethod
-    def extract_keys(problem: str):
-        """
-        Extract the problem number as a key.
-        :param problem: The problem to be processed.
-        :return: the number of the problem.
-        """
-        numbers = problem.split()[1].split('-')
-        return tuple(map(lambda num: float(num), numbers)), problem
+        return list(map(lambda p: Problem(p), group))
